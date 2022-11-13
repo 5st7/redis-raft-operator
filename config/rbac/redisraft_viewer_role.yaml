@@ -1,0 +1,20 @@
+# permissions for end users to view redisrafts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: redisraft-viewer-role
+rules:
+- apiGroups:
+  - db.tsurai.dev
+  resources:
+  - redisrafts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - db.tsurai.dev
+  resources:
+  - redisrafts/status
+  verbs:
+  - get
