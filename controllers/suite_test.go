@@ -31,7 +31,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	dbv1alpha1 "tsurai.dev/redis-raft-operator/api/v1alpha1"
+	dbv1alpha1 "redis-raft-operator/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

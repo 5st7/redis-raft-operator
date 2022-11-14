@@ -18,13 +18,14 @@ package controllers
 
 import (
 	"context"
-
+	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	dbv1alpha1 "redis-raft-operator/api/v1alpha1"
+	"redis-raft-operator/utils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	dbv1alpha1 "tsurai.dev/redis-raft-operator/api/v1alpha1"
 )
 
 // RedisRaftReconciler reconciles a RedisRaft object
@@ -47,9 +48,37 @@ type RedisRaftReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.2/pkg/reconcile
 func (r *RedisRaftReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	reqLogger := log.FromContext(ctx)
+	reqLogger.Info("Reconciling redis raft controller")
 
-	// TODO(user): your logic here
+	instance := &dbv1alpha1.RedisRaft{}
+	err := r.Get(ctx, req.NamespacedName, instance)
+
+	if err != nil {
+		if errors.IsNotFound(err) {
+			reqLogger.Info("RedisRaft resource not found.")
+			return ctrl.Result{}, nil
+		}
+		reqLogger.Error(err, "Failed to get RedisRaft")
+		return ctrl.Result{}, err
+	}
+
+	sts := &appsv1.StatefulSet{}
+	err = r.Get(ctx, req.NamespacedName, sts)
+
+	if err != nil && errors.IsNotFound(err) {
+		spec := utils.NewStatefulSetSpec(instance)
+		reqLogger.Info("Creating a new StatefulSet", "StatefulSet.Namespace", spec.Namespace, "StatefulSet.Name", spec.Name)
+		err = r.Create(ctx, spec)
+		if err != nil {
+			reqLogger.Error(err, "Failed to create new StatefulSet", "StatefulSet.Namespace", spec.Namespace, "StatefulSet.Name", spec.Name)
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{Requeue: true}, nil
+	} else if err != nil {
+		reqLogger.Error(err, "Failed to get StatefulSet")
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }

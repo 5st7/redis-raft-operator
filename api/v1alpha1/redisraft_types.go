@@ -30,6 +30,11 @@ type RedisRaftSpec struct {
 
 	// Foo is an example field of RedisRaft. Edit redisraft_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
+
+	// Replicas is the number of viewers.
+	// +kubebuilder:default=1
+	// +optional
+	Replicas int32 `json:"replicas,omitempty"`
 }
 
 // RedisRaftStatus defines the observed state of RedisRaft

@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	dbv1alpha1 "tsurai.dev/redis-raft-operator/api/v1alpha1"
-	"tsurai.dev/redis-raft-operator/controllers"
+	dbv1alpha1 "redis-raft-operator/api/v1alpha1"
+	"redis-raft-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
